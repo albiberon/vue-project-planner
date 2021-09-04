@@ -1,11 +1,13 @@
 <template>
-  <div class="project">
+  <div class="project" :class="{ complete : project.complete }">
     <div class="actions">
       <h3 @click="detailsVisible = !detailsVisible">{{ project.title }}</h3>
       <div class="icons">
-        <span class="material-icons"> edit </span>
-        <span class="material-icons"> delete </span>
-         <span class="material-icons"> done </span>
+        <router-link :to="{ name: 'EditProject', params: { id: project.id }}">
+          <span class="material-icons" @click="editProject"> edit </span>
+        </router-link>
+        <span class="material-icons" @click="deleteProject"> delete </span>
+        <span class="material-icons tick" @click="toggleComplete"> done </span>
       </div>
     </div>
     <div v-if="detailsVisible" class="details">
@@ -19,13 +21,25 @@ export default {
   data() {
     return {
       detailsVisible: false,
+      uri: "http://localhost:3000/projects/" + this.project.id,
     };
   },
   props: ["project"],
   methods: {
-    // toggleDetails() {
-    //   this.detailsVisible = !this.detailsVisible;
-    // }
+    deleteProject() {
+      fetch(this.uri, { method: "DELETE" })
+        .then(() => this.$emit("delete", this.project.id))
+        .catch((err) => console.log(err))
+    },
+    toggleComplete() {
+      fetch(this.uri, {
+        method: "PATCH",
+        headers: { 'Content-Type' : 'application/json' },
+        body: JSON.stringify({ complete: !this.project.complete })
+        })
+          .then( () => this.$emit("complete" , this.project.id) )
+          .catch( (err) => console.log(err) )
+    }
   },
 };
 </script>
@@ -41,12 +55,33 @@ export default {
   text-align: left;
 }
 
+.project.complete {
+  border-left: 4px solid #00ce89;
+}
+
 h3 {
+  cursor: pointer;
+  display: inline-block;
+}
+
+.material-icons {
+  font-size: 24px;
+  margin-left: 10px;
+  color: #bbb;
   cursor: pointer;
 }
 
+.material-icons:hover {
+  color: #777;
+}
+
 .icons {
-  float: right;
-  display: inline;
+    display: inline-block;
+    float: right;
+    padding-top: 20px;
+}
+
+.project.complete .tick {
+  color: #00ce89;
 }
 </style>
