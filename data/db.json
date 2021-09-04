@@ -4,7 +4,7 @@
       "id": 2,
       "title": "Make marketing email 3",
       "details": "This is the info about the 3",
-      "complete": false
+      "complete": true
     },
     {
       "id": 1,
